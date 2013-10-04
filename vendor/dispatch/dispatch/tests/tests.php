@@ -15,6 +15,16 @@ test('config setting and getting', function () {
   config('false', false);
   assert(config('one') === 1);
   assert(config('false') === false);
+  assert(config('invalid') === null);
+});
+
+test('config setting using an array', function () {
+  config([
+    'name' => 'noodlehaus',
+    'project' => 'dispatch'
+  ]);
+  assert(config('name') === 'noodlehaus');
+  assert(config('project') === 'dispatch');
 });
 
 test('site path setting and getting', function () {
@@ -43,6 +53,18 @@ test('cross-scope values', function () {
  * remote tests
  */
 
+test('before routines', function () {
+  $res = curly('GET', URL.'/index');
+  assert(preg_match('/BEFORE METHOD: GET/', $res));
+  assert(preg_match('/BEFORE PATH: \/index/', $res));
+});
+
+test('after routines', function () {
+  $res = curly('GET', URL.'/index');
+  assert(preg_match('/AFTER METHOD: GET/', $res));
+  assert(preg_match('/AFTER PATH: \/index/', $res));
+});
+
 test('error triggers', function () {
   $res = curly('GET', URL.'/error');
   assert(preg_match('/500 page error/i', $res));
@@ -54,23 +76,29 @@ test('custom error handler', function () {
 });
 
 test('GET handler', function () {
-  $res = curly('GET', URL.'/index');
-  assert(preg_match('/GET route test/', $res));
+  $res = curly('GET', URL.'/index?name=dispatch');
+  assert(preg_match('/GET received dispatch and dispatch/', $res));
 });
 
 test('POST handler', function () {
-  $res = curly('POST', URL.'/index');
-  assert(preg_match('/POST route test/i', $res));
+  $res = curly('POST', URL.'/index', ['name' => 'dispatch']);
+  assert(preg_match('/POST received dispatch and dispatch/i', $res));
 });
 
 test('PUT handler', function () {
-  $res = curly('PUT', URL.'/index');
-  assert(preg_match('/PUT route test/i', $res));
+  $res = curly('PUT', URL.'/index', ['name' => 'dispatch']);
+  assert(preg_match('/PUT received dispatch/i', $res));
 });
 
 test('DELETE handler', function () {
   $res = curly('DELETE', URL.'/index/1');
   assert(preg_match('/DELETE route test/i', $res));
+});
+
+test('POST file upload', function () {
+  $att = curl_file_create(__DIR__.'/upload.txt');
+  $res = curly('POST', URL.'/upload', ['attachment' => $att]);
+  assert(preg_match('/received upload\.txt/', $res));
 });
 
 test('json output', function () {
@@ -141,4 +169,6 @@ test('template rendering', function () {
   assert(preg_match('/<!doctype html>/i', $res));
   assert(preg_match('/dispatch is awesome/', $res));
 });
+
+test_summary();
 ?>

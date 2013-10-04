@@ -5,13 +5,30 @@ use \Suin\RSSWriter\Feed;
 use \Suin\RSSWriter\Channel;
 use \Suin\RSSWriter\Item;
 
+function read_baseurl_once() {
+  return sprintf(
+    "%s://%s%s",
+    isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
+    $_SERVER['HTTP_HOST'],
+    $_SERVER['REQUEST_URI']
+  );
+}
+
+function encode_email_address( $email ) {
+     $output = '';
+     for ($i = 0; $i < strlen($email); $i++) { 
+          $output .= '&#'.ord($email[$i]).';'; 
+     }
+
+     return $output;
+}
+
 /* General Blog Functions */
 
-function get_post_names(){
-
+function get_post_names() {
 	static $_cache = array();
 
-	if(empty($_cache)){
+	if(empty($_cache)) {
 
 		// Get the names of all the
 		// posts (newest first):
@@ -22,7 +39,7 @@ function get_post_names(){
 	return $_cache;
 }
 
-function get_posts($page = 1, $perpage = 0) {
+function get_posts($page = 1, $perpage = 0, $get_titles = FALSE) {
     $firephp = FirePHP::getInstance(true);
 	if($perpage == 0){
 		$perpage = config('posts.perpage');
@@ -37,7 +54,7 @@ function get_posts($page = 1, $perpage = 0) {
 
 	// Create a new instance of the markdown parser
 	$md = new MarkdownParser();
-	
+	$all_titles = array();
 	foreach($posts as $k=>$v){
 
 		$post = new stdClass;
@@ -50,8 +67,7 @@ function get_posts($page = 1, $perpage = 0) {
 		$post->url = site().date('Y/m', $post->date).'/'.str_replace('.md','',$arr[1]);
         
 		// Get the contents and convert it to HTML
-		$content = $md->transformMarkdown(file_get_contents($v));
-        
+		$content = $md->transformMarkdown(file_get_contents($v));       
         
         
 		// Extract the title and body
@@ -61,11 +77,19 @@ function get_posts($page = 1, $perpage = 0) {
         $excerpt_split = explode('<p class="excerpt"></p>', $post->body);
         $post->excerpt = $excerpt_split[0];
         $post->continue = !empty($excerpt_split[1])?TRUE:FALSE;
+        
+        array_push($all_titles, array(
+            'title' => $post->title,
+            'url' => $post->url
+        ));
 
 		$tmp[] = $post;
 	}
-
-	return $tmp;
+    if($get_titles) {
+        return $all_titles;
+    } else {
+        return $tmp;
+    }
 }
 
 // Find post by year, month and name

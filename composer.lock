@@ -61,16 +61,16 @@
         },
         {
             "name": "dispatch/dispatch",
-            "version": "2.2.1",
+            "version": "2.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/noodlehaus/dispatch.git",
-                "reference": "2.2.1"
+                "reference": "2.2.5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/noodlehaus/dispatch/zipball/2.2.1",
-                "reference": "2.2.1",
+                "url": "https://api.github.com/repos/noodlehaus/dispatch/zipball/2.2.5",
+                "reference": "2.2.5",
                 "shasum": ""
             },
             "require": {
@@ -107,7 +107,7 @@
                 "microphp",
                 "router"
             ],
-            "time": "2013-08-01 08:43:49"
+            "time": "2013-08-12 06:52:41"
         },
         {
             "name": "firephp/firephp-core",

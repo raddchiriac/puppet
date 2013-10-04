@@ -4,9 +4,6 @@
  * @license MIT
  */
 
-if (!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 50400)
-  error(500, 'dispatch requires at least PHP 5.4 to run.');
-
 /**
  * Function for setting http error code handlers and for
  * triggering them. Execution stops after an error callback
@@ -19,7 +16,7 @@ if (!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 50400)
  */
 function error($code, $callback = null) {
 
-  static $error_callbacks = [];
+  static $error_callbacks = array();
 
   $code = (string) $code;
 
@@ -55,14 +52,25 @@ function error($code, $callback = null) {
  */
 function config($key, $value = null) {
 
-  static $_config = [];
+  static $_config = array();
 
-  if ($key === 'source' && file_exists($value))
-    $_config = array_merge($_config, parse_ini_file($value, true));
-  else if ($value === null)
-    return (isset($_config[$key]) ? $_config[$key] : null);
+  if (is_string($key)) {
 
-  return ($_config[$key] = $value);
+    if ($key !== 'source') {
+
+      if ($value === null)
+        return (isset($_config[$key]) ? $_config[$key] : null);
+
+      return ($_config[$key] = $value);
+
+    } else {
+      !file_exists($value) && error(500, "File passed to config('source') not found");
+      $_config = array_merge($_config, parse_ini_file($value, true));
+    }
+
+  } else if (is_array($key) && array_diff_key($key, array_keys(array_keys($key)))) {
+    $_config = array_merge($_config, $key);
+  }
 }
 
 /**
@@ -100,17 +108,15 @@ function site($path_only = false) {
  */
 function flash($key, $msg = null, $now = false) {
 
-  static $x = [];
+  static $x = array();
 
   $f = config('dispatch.flash_cookie');
-
-  if (!$f)
-    error(500, "config('dispatch.flash_cookie') is not set.");
+  $f = (!$f ? '_F' : $f);
 
   if ($c = cookie($f))
     $c = json_decode($c, true);
   else
-    $c = [];
+    $c = array();
 
   if ($msg == null) {
 
@@ -151,8 +157,9 @@ function u($str) {
  *
  * @return string encoded string
  */
-function h($str, $flags = ENT_QUOTES, $enc = 'UTF-8') {
-  return htmlentities($str, $flags, $enc);
+function h($str, $flags = -1, $enc = 'UTF-8', $denc = true) {
+  $flags = ($flags < 0 ? ENT_COMPAT|ENT_HTML401 : $flags);
+  return htmlentities($str, $flags, $enc, $denc);
 }
 
 /**
@@ -193,13 +200,23 @@ function params($name = null, $default = null) {
  */
 function session($name, $value = null) {
 
-  static $status = -1;
+  static $session_active = false;
 
-  if ($status < 0) {
-    if (($status = session_status()) === PHP_SESSION_DISABLED)
-      error(500, 'call to session() failed, sessions are disabled');
-    else if ($status === PHP_SESSION_NONE)
+  // ref: stackoverflow.com/questions/3788369/how-to-tell-if-a-session-is-active/7656468#7656468
+  if ($session_active === false) {
+
+    if (($current = ini_get('session.use_trans_sid')) === false)
+      error(500, 'Calls to session() requires [session.use_trans_sid] to be set');
+
+    $test = "mix{$current}{$current}";
+
+    $prev = @ini_set('session.use_trans_sid', $test);
+    $peek = @ini_set('session.use_trans_sid', $current);
+
+    if ($peek !== $current && $peek !== false)
       session_start();
+
+    $session_active = true;
   }
 
   if (func_num_args() === 1)
@@ -269,7 +286,7 @@ function upload($name) {
   // if file field is an array
   if (is_array($_FILES[$name]['name'])) {
 
-    $result = [];
+    $result = array();
 
     // consolidate file info
     foreach ($_FILES[$name] as $k1 => $v1)
@@ -307,7 +324,7 @@ function upload($name) {
  */
 function scope($name, $value = null) {
 
-  static $_stash = [];
+  static $_stash = array();
 
   if ($value === null)
     return isset($_stash[$name]) ? $_stash[$name] : null;
@@ -404,8 +421,8 @@ function content($value = null) {
  */
 function render($view, $locals = null, $layout = null) {
 
-  if (($view_root = config('dispatch.views')) == null)
-    error(500, "config('dispatch.views') is not set.");
+  $view_root = config('dispatch.views');
+  $view_root = (!$view_root ? 'layout' : $view_root);
 
   if (is_array($locals) && count($locals))
     extract($locals, EXTR_SKIP);
@@ -481,7 +498,7 @@ function json_out($obj, $func = null) {
  */
 function filter($symbol, $callback = null) {
 
-  static $filter_callbacks = [];
+  static $filter_callbacks = array();
 
   if (is_callable($callback)) {
     $filter_callbacks[$symbol][] = $callback;
@@ -505,15 +522,15 @@ function filter($symbol, $callback = null) {
  *
  * @return void
  */
-function before($callback = null) {
+function before($method_or_cb = null, $path = null) {
 
-  static $before_callbacks = [];
+  static $before_callbacks = array();
 
-  if ($callback === null) {
+  if (!is_callable($method_or_cb)) {
     foreach ($before_callbacks as $callback)
-      call_user_func($callback);
+      call_user_func_array($callback, array($method_or_cb, $path));
   } else {
-    $before_callbacks[] = $callback;
+    $before_callbacks[] = $method_or_cb;
   }
 }
 
@@ -525,15 +542,15 @@ function before($callback = null) {
  *
  * @return void
  */
-function after($callback = null) {
+function after($method_or_cb = null, $path = null) {
 
-  static $after_callbacks = [];
+  static $after_callbacks = array();
 
-  if ($callback === null) {
+  if (!is_callable($method_or_cb)) {
     foreach ($after_callbacks as $callback)
-      call_user_func($callback);
+      call_user_func_array($callback, array($method_or_cb, $path));
   } else {
-    $after_callbacks[] = $callback;
+    $after_callbacks[] = $method_or_cb;
   }
 }
 
@@ -554,16 +571,16 @@ function after($callback = null) {
 function on($method, $path, $callback = null) {
 
   // callback map by request type
-  static $routes = [
-    'HEAD' => [],
-    'GET' => [],
-    'POST' => [],
-    'PUT' => [],
-    'PATCH' => [],
-    'DELETE' => []
-  ];
+  static $routes = array(
+    'HEAD' => array(),
+    'GET' => array(),
+    'POST' => array(),
+    'PUT' => array(),
+    'PATCH' => array(),
+    'DELETE' => array()
+  );
 
-  // we don't want slashes in both ends
+  // we don't want slashes on ends
   $path = trim($path, '/');
 
   // a callback was passed, so we create a route defiition
@@ -578,16 +595,16 @@ function on($method, $path, $callback = null) {
     $method = (array) $method;
 
     // wildcard method means for all supported methods
-    if (in_array('*', $method)) {
-      $method = array_keys($routes);
-    } else {
+    if (!in_array('*', $method)) {
       array_walk($method, function (&$m) { $m = strtoupper($m); });
       $method = array_intersect(array_keys($routes), $method);
+    } else {
+      $method = array_keys($routes);
     }
 
     // create a route entry for this path on every method
     foreach ($method as $m)
-      $routes[$m][$path] = ['regex' => '@^'.$regex.'$@i', 'callback' => $callback];
+      $routes[$m][$path] = array('regex' => '@^'.$regex.'$@i', 'callback' => $callback);
 
   } else {
 
@@ -597,10 +614,6 @@ function on($method, $path, $callback = null) {
 
     // then normalize
     $method = strtoupper($method);
-
-    // do we have a method override?
-    if (params('_method'))
-      $method = strtoupper(params('_method'));
 
     // for invokation, only support strings
     if (!in_array($method, array_keys($routes)))
@@ -669,12 +682,15 @@ function dispatch($method = null, $path = null) {
     $path = preg_replace('@^/?'.preg_quote(trim($root, '/')).'@i', '', $path);
 
   // setup shutdown func for after() callbacks
-  register_shutdown_function(function () {
-    after();
+  register_shutdown_function(function () use ($method, $path) {
+    after($method, $path);
   });
 
+  // check for method override
+  $method = (($method = params('_method')) ? $method : $_SERVER['REQUEST_METHOD']);
+
   // call all before() callbacks
-  before();
+  before($method, $path);
 
   // match it
   on($method, $path);

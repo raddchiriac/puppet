@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="ro">
 <head>
 	<title><?php echo isset($title) ? h($title) : config('blog.title') ?></title>
 
@@ -10,14 +10,15 @@
 
 	<link rel="alternate" type="application/rss+xml" title="<?php echo config('blog.title')?>  Feed" href="<?php echo site()?>rss" />
 
-	<link href='http://fonts.googleapis.com/css?family=Great+Vibes' rel='stylesheet' type='text/css'>  
-    <link href='http://fonts.googleapis.com/css?family=Sintony' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Great+Vibes&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Sintony:400,700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
 	<link href="<?php echo site() ?>assets/css/style.css" rel="stylesheet" />
 
 	<!--[if lt IE 9]>
 		<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
-	
+    
+	<!--<script src="<?php echo site() ?>assets/js/lib/require.js" data-main="<?php echo site() ?>assets/js/global"></script>-->
 </head>
 <body>
 
@@ -29,9 +30,9 @@
 
 		<ul>
 			<li><a href="<?php echo site() ?>">Blog</a></li>
-			<li><a href="#">Scenariu</a></li>
+			<li><a href="#">Proiect</a></li>
 			<li><a href="#">Echipă</a></li>
-			<li><a href="#">Contact</a></li>
+			<li><a href="<?php echo site() ?>contact">Contact</a></li>
 		</ul>
 
 		<p class="author"><?php echo config('blog.authorbio') ?></p>

@@ -4,13 +4,13 @@ Este defapt a doua oară când ne vedem, însă prima în care toţi copiii prez
 
 <p class="excerpt"></p>
 
-Iată câteva imagini cu cei 18 copii din timpul interviurilor.
+Iată câteva imagini din timpul interviurilor cu cei 18 copii.
 
-<figure class="kids">
+<figure class="kids star">
   ![img]({{siteurl}}assets/img/vio.bmp.jpg)
   <figcaption>Vio</figcaption>
 </figure>
-<figure class="kids">
+<figure class="kids star">
   ![img]({{siteurl}}assets/img/stefi.bmp.jpg)
   <figcaption>Ştefi</figcaption>
 </figure>
@@ -22,7 +22,7 @@ Iată câteva imagini cu cei 18 copii din timpul interviurilor.
   ![img]({{siteurl}}assets/img/giulia.bmp.jpg)
   <figcaption>Giulia</figcaption>
 </figure>
-<figure class="kids">
+<figure class="kids star">
   ![img]({{siteurl}}assets/img/daiana.bmp.jpg)
   <figcaption>Daiana</figcaption>
 </figure>
@@ -30,7 +30,7 @@ Iată câteva imagini cu cei 18 copii din timpul interviurilor.
   ![img]({{siteurl}}assets/img/miruna.bmp.jpg)
   <figcaption>Miruna</figcaption>
 </figure>
-<figure class="kids">
+<figure class="kids star">
   ![img]({{siteurl}}assets/img/antonia.bmp.jpg)
   <figcaption>Antonia</figcaption>
 </figure>
@@ -38,7 +38,7 @@ Iată câteva imagini cu cei 18 copii din timpul interviurilor.
   ![img]({{siteurl}}assets/img/cristina.bmp.jpg)
   <figcaption>Cristina</figcaption>
 </figure>
-<figure class="kids">
+<figure class="kids star">
   ![img]({{siteurl}}assets/img/alexandra.bmp.jpg)
   <figcaption>Alexandra</figcaption>
 </figure>
@@ -46,7 +46,7 @@ Iată câteva imagini cu cei 18 copii din timpul interviurilor.
   ![img]({{siteurl}}assets/img/beatrice.bmp.jpg)
   <figcaption>Beatrice</figcaption>
 </figure>
-<figure class="kids">
+<figure class="kids star">
   ![img]({{siteurl}}assets/img/andreea.bmp.jpg)
   <figcaption>Andreea</figcaption>
 </figure>
@@ -62,11 +62,11 @@ Iată câteva imagini cu cei 18 copii din timpul interviurilor.
   ![img]({{siteurl}}assets/img/monica.bmp.jpg)
   <figcaption>Monica</figcaption>
 </figure>
-<figure class="kids">
+<figure class="kids star">
   ![img]({{siteurl}}assets/img/anca.bmp.jpg)
   <figcaption>Anca</figcaption>
 </figure>
-<figure class="kids">
+<figure class="kids star">
   ![img]({{siteurl}}assets/img/mariana.bmp.jpg)
   <figcaption>Mariana</figcaption>
 </figure>
@@ -74,7 +74,7 @@ Iată câteva imagini cu cei 18 copii din timpul interviurilor.
   ![img]({{siteurl}}assets/img/dragos.bmp.jpg)
   <figcaption>Dragoş</figcaption>
 </figure>
-<figure class="kids">
+<figure class="kids star">
   ![img]({{siteurl}}assets/img/alex.bmp.jpg)
   <figcaption>Alex</figcaption>
 </figure>

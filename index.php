@@ -61,6 +61,34 @@ on('GET', '/rss',function() {
 	echo generate_rss(get_posts(1, 30));
 });
 
+on('GET', '/admin', function(){
+    render('admin',array(
+		'title' => 'admin' .' ⋅ ' . config('blog.title')
+	));    
+});
+
+on('GET', '/contact', function(){
+    render('contact', array(
+		'title' => 'Contact' .' ⋅ ' . config('blog.title')
+	));    
+});
+
+on('POST', '/mesaj', function() {
+    $name = ucwords(strtolower(trim(params('nume'))));
+    $mesaj = params('mesaj');
+    $date = time();
+    $today = date("Y-m-d");
+    $file = preg_replace('/[^a-zA-Z0-9-]/', '-', $name);
+    
+    $my_file = 'posts/messages/'.$date.'_'.$today.'_'.$file.'.md';
+    $handle = fopen($my_file, 'w') or die('Cannot open file:  '.$my_file);
+    
+    $data = '# '.$name."\r\n\r\n".$mesaj;
+    fwrite($handle, $data);
+    fclose($handle);
+    
+    echo "301";
+});
 
 // If we get here, it means that
 // nothing has been matched above
@@ -68,6 +96,8 @@ on('GET', '/rss',function() {
 on('GET', '.*',function() {
 	not_found();
 });
+
+
 
 // Serve the blog
 dispatch();

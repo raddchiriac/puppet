@@ -1,5 +1,5 @@
-Dispatch 2
-==========
+Dispatch
+========
 **NOTE**: If you're looking for Dispatch 1.x, switch to the
 [**1.x branch**](https://github.com/noodlehaus/dispatch/tree/1.x).
 
@@ -8,6 +8,13 @@ to use. No classes, no namespaces.
 
 ## Requirements
 Dispatch requires at least **PHP 5.4** to work.
+
+However, no strict version check is being done by Dispatch, and no functions
+specific to 5.4 are being used. The reason for the 5.4 requirement is because
+5.3's end of life has already been announced, and 5.5 has already been released.
+
+The other reason is that the adhoc tests for Dispatch make use of 5.4's built-in
+web server.
 
 ## Code
 Get the code on GitHub: <http://github.com/noodlehaus/dispatch>.
@@ -52,10 +59,10 @@ Some settings are needed by Dispatch, and they can be set via `config()`.
 // REQUIRED, base path for your views
 config('dispatch.views', '../views');
 
-// REQUIRED, default layout to use (omit .html.php extension)
+// OPTIONAL, layout file to use (defaults to 'layout')
 config('dispatch.layout', 'layout');
 
-// REQUIRED, cookie name to use for flash messages
+// OPTIONAL, cookie for flash messages (defaults to '_F')
 config('dispatch.flash_cookie', '_F');
 
 // OPTIONAL, specify your app's full URL
@@ -63,6 +70,15 @@ config('dispatch.url', 'http://somedomain.com/someapp/path');
 
 // OPTIONAL, routing file to be taken off of the request URI
 config('dispatch.router', 'index.php');
+
+// you can also just pass a hash of settings in one call
+config([
+  'dispatch.views' => '../views',
+  'dispatch.layout' => 'layout',
+  'dispatch.flash_cookie' => '_F',
+  'dispatch.url' => 'http://somedomain.com/somapp/path',
+  'dispatch.router' => 'index.php'
+]);
 ?>
 ```
 
@@ -211,17 +227,17 @@ on('GET', '/blogs/:blog_id', function ($blog_id) {
 
 ## Before and After Callbacks
 To setup routines to be run before and after a request, use `before($callable)` and `after($callable)`
-respectively.
+respectively. The callback routines will receive two arguments - the `REQUEST_METHOD`, and the `REQUEST_URI`.
 
 ```php
 <?php
 // setup a function to be called before each request
-before(function () {
+before(function ($method, $path) {
   // setup stuff
 });
 
 // setup a function to be called after each request
-after(function () {
+after(function ($method, $path) {
   // clean up stuff
 });
 ?>

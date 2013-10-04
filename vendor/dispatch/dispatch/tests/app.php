@@ -7,6 +7,16 @@ config('dispatch.views', './views');
 config('dispatch.layout', 'layout');
 config('dispatch.url', 'http://localhost:1234/');
 
+// before routine
+before(function ($method, $path) {
+  echo "BEFORE METHOD: {$method}, BEFORE PATH: {$path}".PHP_EOL;
+});
+
+// after routine
+after(function ($method, $path) {
+  echo "AFTER METHOD: {$method}, AFTER PATH: {$path}".PHP_EOL;
+});
+
 // routines for testing
 error(404, function () {
   echo "file not found";
@@ -17,15 +27,20 @@ on('GET', '/error', function () {
 });
 
 on('GET', '/index', function () {
-  echo "GET route test";
+  $name1 = params('name');
+  $name2 = $_GET['name'];
+  echo "GET received {$name1} and {$name2}";
 });
 
 on('POST', '/index', function () {
-  echo "POST route test";
+  $name1 = params('name');
+  $name2 = $_POST['name'];
+  echo "POST received {$name1} and {$name2}";
 });
 
 on('PUT', '/index', function () {
-  echo "PUT route test";
+  parse_str(request_body(), $vars);
+  echo "PUT received {$vars['name']}";
 });
 
 on('DELETE', '/index/:id', function ($id) {
@@ -105,6 +120,14 @@ on('GET', '/session/check', function () {
   if (session('type'))
     echo "type is still set";
   echo session('name');
+});
+
+on('POST', '/upload', function () {
+  $info = upload('attachment');
+  if (is_array($info) && is_uploaded_file($info['tmp_name']))
+    echo "received {$info['name']}";
+  else
+    echo "failed upload";
 });
 
 dispatch();

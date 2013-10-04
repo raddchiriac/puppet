@@ -3,6 +3,7 @@
         "dflydev/markdown": "v1.0.2",
         "suin/php-rss-writer": ">=1.0",
         "dispatch/dispatch": "2.*",
-        "firephp/firephp-core": "dev-master"
+        "firephp/firephp-core": "dev-master",
+	"xi/ajax-bundle": "2.3.*@dev"
     }
 }
